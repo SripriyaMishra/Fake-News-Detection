@@ -97,7 +97,7 @@ git clone https://github.com/SripriyaMishra/Fake-News-Detection.git
 ### 2. Open Project Folder
 
 ```bash
-cd Fake-News-Detection
+cd Fake News Detector
 ```
 
 ### 3. Install Dependencies
@@ -106,13 +106,19 @@ cd Fake-News-Detection
 pip install -r requirements.txt
 ```
 
-### 4. Run Flask Server
+### 4. Train the Model
+
+```bash
+python model.py
+```
+
+### 5. Run Flask Server
 
 ```bash
 python app.py
 ```
 
-### 5. Open Browser
+### 6. Open Browser
 
 ```text
 http://127.0.0.1:5000
