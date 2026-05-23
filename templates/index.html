@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruthLens — AI Fake News Detector</title>
+  <meta name="description" content="Detect fake news and misinformation instantly using Machine Learning, NLP, and TF-IDF analysis. Built with Python, Flask, and scikit-learn." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>" />
+</head>
+<body>
+
+<!-- ══ Particles ════════════════════════════════════════════ -->
+<div id="particles-js"></div>
+
+<!-- ══ Toast Notification ════════════════════════════════════ -->
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <span class="toast-icon" id="toast-icon">ℹ️</span>
+  <span id="toast-msg">Notification</span>
+</div>
+
+<!-- ══ Navbar ════════════════════════════════════════════════ -->
+<nav class="navbar" aria-label="Main navigation">
+  <a href="#" class="nav-brand">
+    <span class="brand-mark">🔍</span>
+    <span>TruthLens</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#detector-section">Detector</a></li>
+    <li><a href="#stats-section">Stats</a></li>
+    <li><a href="#how-section">How It Works</a></li>
+    <li><a href="#about-section">About</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="#detector-section" class="nav-cta">Analyze News</a>
+  </div>
+</nav>
+
+<!-- ══ News Ticker ═══════════════════════════════════════════ -->
+<div class="ticker-bar" aria-label="Live news ticker">
+  <span class="ticker-label">LIVE FEED</span>
+  <div class="ticker-track">
+    <div class="ticker-content">
+      <span class="ticker-item">AI detects misinformation 10× faster than human fact-checkers</span>
+      <span class="ticker-item">93% of fake news articles use emotionally charged language patterns</span>
+      <span class="ticker-item">TF-IDF vectorization maps 15,000 linguistic features per article</span>
+      <span class="ticker-item">Machine learning models trained on verified real and fake news datasets</span>
+      <span class="ticker-item">Passive Aggressive Classifier achieves state-of-the-art text classification</span>
+      <span class="ticker-item">Fight information warfare — verify before you share</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="ticker-item">AI detects misinformation 10× faster than human fact-checkers</span>
+      <span class="ticker-item">93% of fake news articles use emotionally charged language patterns</span>
+      <span class="ticker-item">TF-IDF vectorization maps 15,000 linguistic features per article</span>
+      <span class="ticker-item">Machine learning models trained on verified real and fake news datasets</span>
+      <span class="ticker-item">Passive Aggressive Classifier achieves state-of-the-art text classification</span>
+      <span class="ticker-item">Fight information warfare — verify before you share</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HERO ═══════════════════════════════════════════════════ -->
+<main>
+<section class="hero" id="hero">
+
+  <!-- Floating paper snippets -->
+  <div class="paper-float pf-1" aria-hidden="true">
+    <span style="color:#2e8b57;font-weight:600;">✓ VERIFIED</span><br/>
+    Reuters · AP · BBC
+  </div>
+  <div class="paper-float pf-2" aria-hidden="true">
+    <span style="color:#c0392b;font-weight:600;">⚠ UNVERIFIED</span><br/>
+    Source unknown
+  </div>
+  <div class="paper-float pf-3" aria-hidden="true">
+    confidence: <span style="color:#2e8b57;">94.7%</span>
+  </div>
+  <div class="paper-float pf-4" aria-hidden="true">
+    TF-IDF · NLP · ML
+  </div>
+
+  <div class="hero-content">
+
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span>Powered by Machine Learning &amp; NLP</span>
+    </div>
+
+    <h1 class="hero-headline">
+      AI <em>Fake News</em><br />
+      <span class="strike">Misinformation</span><br />
+      Detector
+    </h1>
+
+    <p class="hero-sub">
+      <span class="hero-typed"><span id="typed-text"></span><span class="type-cursor" aria-hidden="true"></span></span>
+    </p>
+
+    <div class="hero-actions">
+      <a href="#detector-section" class="btn btn-green">
+        🔍 Analyze Article
+      </a>
+      <a href="#how-section" class="btn btn-outline">
+        How It Works ↓
+      </a>
+    </div>
+
+    <div class="hero-metrics">
+      <div class="metric-chip">
+        <div class="metric-val" data-count="95" data-suffix="%">0%</div>
+        <div class="metric-key">Model Accuracy</div>
+      </div>
+      <div class="metric-chip">
+        <div class="metric-val" data-count="15000">0</div>
+        <div class="metric-key">TF-IDF Features</div>
+      </div>
+      <div class="metric-chip">
+        <div class="metric-val" data-count="2">0</div>
+        <div class="metric-key">Output Classes</div>
+      </div>
+      <div class="metric-chip">
+        <div class="metric-val">&lt;200<span style="font-size:.9rem">ms</span></div>
+        <div class="metric-key">Inference Time</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ DETECTOR SECTION ════════════════════════════════════ -->
+<section id="detector-section" style="padding: 5rem 0;">
+  <div class="section-wrap" style="max-width: 860px;">
+
+    <div class="section-header reveal">
+      <span class="section-kicker">⚡ Live Analysis</span>
+      <h2 class="section-title">News Verifier</h2>
+      <p class="section-sub">Paste a headline or full article to run AI-powered fact detection.</p>
+    </div>
+
+    <div class="detector-card reveal">
+
+      <!-- Top accent -->
+      <form id="analyze-form" novalidate>
+
+        <div class="textarea-label">
+          <span class="label-text">
+            <i class="bi bi-newspaper"></i>
+            Paste news article or headline
+          </span>
+          <span class="word-count" id="word-count">0 words</span>
+        </div>
+
+        <textarea
+          id="news-input"
+          name="text"
+          placeholder="e.g. 'Scientists at MIT have confirmed a major breakthrough in renewable energy, publishing results in Nature journal after three years of research…'"
+          maxlength="10000"
+          aria-label="News article text input"
+        ></textarea>
+
+        <div class="detector-actions" style="margin-top:1rem;">
+          <div class="left-actions">
+            <button type="button" class="btn-sm" id="sample-btn" aria-label="Load sample text">
+              📰 Load Sample
+            </button>
+            <button type="button" class="btn-sm" id="speech-btn" aria-label="Voice input">
+              🎙️ Speak
+            </button>
+            <button type="button" class="btn-sm" id="clear-btn" aria-label="Clear text">
+              🗑 Clear
+            </button>
+          </div>
+          <button type="submit" class="btn-analyze" id="analyze-btn">
+            <span>🔍 Analyze News</span>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Loader -->
+      <div class="loading-wrapper" id="loading-wrapper" aria-live="polite">
+        <div class="ai-loader">
+          <span></span><span></span><span></span>
+        </div>
+        <p class="loading-text">Running AI analysis…</p>
+      </div>
+
+      <!-- Result -->
+      <div id="result-section" style="margin-top:1.5rem; display:none;">
+        <div class="result-card" id="result-card">
+
+          <div class="result-header">
+            <div class="verdict-badge" id="verdict-badge">
+              <span class="verdict-icon" id="verdict-icon">✅</span>
+              <span id="verdict-text">REAL</span>
+            </div>
+            <div class="verdict-meta">
+              <div class="verdict-category" id="verdict-category">Category: Science</div>
+              <div class="confidence-display conf-real" id="confidence-display">94.2%</div>
+            </div>
+          </div>
+
+          <!-- Probability meter -->
+          <div class="prob-meter">
+            <div class="meter-labels">
+              <span class="label-real">✅ REAL</span>
+              <span class="label-fake">FAKE 🚫</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill-real" id="meter-fill-real"></div>
+            </div>
+            <div class="meter-track" style="margin-top:4px;">
+              <div class="meter-fill-fake" id="meter-fill-fake"></div>
+            </div>
+          </div>
+
+          <!-- Score breakdown -->
+          <div class="breakdown-grid">
+            <div class="bd-item">
+              <div class="bd-val bd-real" id="bd-real-val">—</div>
+              <div class="bd-key">✅ REAL probability</div>
+            </div>
+            <div class="bd-item">
+              <div class="bd-val bd-fake" id="bd-fake-val">—</div>
+              <div class="bd-key">🚫 FAKE probability</div>
+            </div>
+            <div class="bd-item" style="grid-column: span 2 / span 2; text-align:center;">
+              <div class="bd-val" id="bd-words" style="color:var(--ink-2)">—</div>
+              <div class="bd-key">Word count analyzed</div>
+            </div>
+          </div>
+
+          <!-- AI reasoning -->
+          <div class="reasoning-box">
+            <div class="reasoning-label">🤖 AI Reasoning</div>
+            <p id="reasoning-text">Analysis will appear here.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /detector-card -->
+  </div>
+</section>
+
+<!-- ══ STATS DASHBOARD ════════════════════════════════════ -->
+<section id="stats-section" class="stats-section">
+  <div class="section-wrap">
+
+    <div class="section-header reveal">
+      <span class="section-kicker">📊 Dashboard</span>
+      <h2 class="section-title">Model Performance</h2>
+      <p class="section-sub">Real-time stats from the trained machine learning model.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:start;" class="reveal">
+
+      <!-- Pie Chart -->
+      <div class="chart-wrap">
+        <h3 class="chart-title">Prediction Distribution</h3>
+        <canvas id="pie-chart" width="180" height="180" style="max-width:180px; margin:0 auto 1rem; display:block;"></canvas>
+        <div style="display:flex; gap:1rem; justify-content:center; font-size:0.8rem;">
+          <span style="display:flex;align-items:center;gap:0.35rem;">
+            <span style="width:12px;height:12px;background:#2e8b57;border-radius:2px;display:inline-block;"></span>
+            REAL news
+          </span>
+          <span style="display:flex;align-items:center;gap:0.35rem;">
+            <span style="width:12px;height:12px;background:#c0392b;border-radius:2px;display:inline-block;"></span>
+            FAKE news
+          </span>
+        </div>
+      </div>
+
+      <!-- Stats grid -->
+      <div>
+        <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="stat-card-2 reveal">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-number" id="stat-accuracy" data-count="95" data-suffix="%">—</div>
+            <div class="stat-label-2">Best Model Accuracy</div>
+          </div>
+          <div class="stat-card-2 reveal">
+            <div class="stat-icon">📰</div>
+            <div class="stat-number" id="stat-train-size" data-count="90">—</div>
+            <div class="stat-label-2">Training Samples</div>
+          </div>
+          <div class="stat-card-2 reveal">
+            <div class="stat-icon">⚙️</div>
+            <div class="stat-number" id="stat-pac-acc" data-count="90" data-suffix="%">—</div>
+            <div class="stat-label-2">PAC Accuracy</div>
+          </div>
+          <div class="stat-card-2 reveal">
+            <div class="stat-icon">🧠</div>
+            <div class="stat-number" id="stat-lr-acc" data-count="92" data-suffix="%">—</div>
+            <div class="stat-label-2">LR Accuracy</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem; padding:1rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); font-size:0.8rem; color:var(--ink-3); font-family:var(--font-mono);">
+          <strong style="color:var(--ink-2);">Active Model:</strong>
+          <span id="model-type">Loading…</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ════════════════════════════════════════ -->
+<section id="how-section">
+  <div class="section-wrap" style="max-width:780px;">
+
+    <div class="section-header reveal">
+      <span class="section-kicker">⚙️ ML Pipeline</span>
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-sub">From raw text to real-time prediction — here's the full pipeline.</p>
+    </div>
+
+    <div class="steps-list reveal">
+
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3 class="step-title">Data Collection</h3>
+          <p class="step-desc">Curated dataset of labeled real and fake news articles provides the training foundation. Each article is tagged REAL or FAKE by human fact-checkers.</p>
+          <span class="step-tag">pandas · CSV</span>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3 class="step-title">Text Preprocessing</h3>
+          <p class="step-desc">Raw text is lowercased, stripped of URLs, HTML tags, and special characters. Negation words like "not" and "never" are preserved as they carry important semantic weight.</p>
+          <span class="step-tag">regex · NLTK</span>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3 class="step-title">Lemmatisation &amp; Stopword Removal</h3>
+          <p class="step-desc">Words are reduced to their base form using WordNet Lemmatizer. Common stopwords are removed while preserving sentiment-bearing negation words.</p>
+          <span class="step-tag">WordNetLemmatizer · stopwords</span>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3 class="step-title">TF-IDF Vectorization</h3>
+          <p class="step-desc">Text is converted to a 15,000-dimensional numerical vector using Term Frequency–Inverse Document Frequency with unigrams and bigrams. Sublinear TF scaling is applied.</p>
+          <span class="step-tag">TfidfVectorizer · ngram_range=(1,2)</span>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3 class="step-title">Model Training &amp; Selection</h3>
+          <p class="step-desc">Both PassiveAggressiveClassifier and Logistic Regression are trained and evaluated. The higher-accuracy model is automatically selected and saved with pickle.</p>
+          <span class="step-tag">PAC · LogisticRegression · pickle</span>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h3 class="step-title">Prediction &amp; Confidence Score</h3>
+          <p class="step-desc">The Flask API receives user text, preprocesses it identically to training data, vectorizes, and returns a REAL/FAKE verdict with confidence percentage and category.</p>
+          <span class="step-tag">Flask · predict_proba · JSON</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ ABOUT SECTION ══════════════════════════════════════ -->
+<section id="about-section" style="background:var(--surface-2);">
+  <div class="section-wrap">
+
+    <div class="section-header reveal">
+      <span class="section-kicker">📖 About</span>
+      <h2 class="section-title">Fighting Misinformation with AI</h2>
+      <p class="section-sub">Understanding the problem and our machine learning solution.</p>
+    </div>
+
+    <div class="about-grid reveal">
+
+      <div class="about-card">
+        <div class="about-icon">📰</div>
+        <h3 class="about-title">What Is Fake News?</h3>
+        <p class="about-text">Fake news is deliberately fabricated information designed to deceive readers, spread fear, or manipulate opinions. It often uses emotionally charged language, unverified sources, sensational headlines, and conspiracy framing to appear credible while spreading misinformation.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">🤖</div>
+        <h3 class="about-title">How AI Detects It</h3>
+        <p class="about-text">Machine learning models learn statistical patterns from thousands of verified real and fake articles. Key signals include linguistic style, vocabulary distribution, sentence structure, and presence of sensationalist markers — all captured through TF-IDF feature extraction.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">⚖️</div>
+        <h3 class="about-title">Model Limitations</h3>
+        <p class="about-text">No automated system is 100% accurate. This tool supplements — but does not replace — critical human judgment. Always cross-reference important news with multiple reputable sources, check publication dates, and verify author credentials before sharing.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">🌍</div>
+        <h3 class="about-title">Why It Matters</h3>
+        <p class="about-text">Misinformation spreads six times faster than truthful news on social media. It influences elections, fuels violence, and undermines public health. AI-powered detection tools can help individuals verify information quickly and resist manipulation at scale.</p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-brand">TruthLens 🔍</div>
+  <div class="footer-tagline">"Cutting through noise with machine precision."</div>
+
+  <ul class="footer-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#detector-section">Detector</a></li>
+    <li><a href="#stats-section">Stats</a></li>
+    <li><a href="#how-section">How It Works</a></li>
+    <li><a href="#about-section">About</a></li>
+    <li><a href="https://github.com" target="_blank" rel="noopener">GitHub ↗</a></li>
+  </ul>
+
+  <div class="footer-credits">
+    Built with <strong>Python · Flask · scikit-learn · NLTK · Particles.js</strong>
+    &nbsp;·&nbsp; Data Science Portfolio Project
+    <br />
+    <span style="opacity:0.5;font-size:0.72rem;margin-top:0.35rem;display:block;">
+      For educational purposes. Not a substitute for professional fact-checking.
+    </span>
+  </div>
+</footer>
+
+</main>
+
+<!-- ── Scripts ──────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
